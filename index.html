@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PanzerHammer — The Iron Gate</title>
+  <meta name="description" content="Turn-based hex battle with Horus Heresy units on an original map. Panzer Marshal maps are not included.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="legions/Imperialfist.jpg">
+  <link rel="stylesheet" href="panzerhammer.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="top">
+      <div class="identity">
+        <div class="banners">
+          <img id="banner-player" alt="Imperial Fists banner" src="legions/Imperialfist.jpg">
+          <img id="banner-enemy" alt="Iron Warriors banner" src="legions/Ironwarriors.jpg">
+        </div>
+        <div>
+          <p class="eyebrow">PanzerHammer · original field</p>
+          <h1 id="battle-name">The Iron Gate</h1>
+          <p class="sub" id="battle-sub">Imperial Fists against Iron Warriors. Original fortress field.</p>
+        </div>
+      </div>
+      <div class="turnbox" id="turnbox">
+        <strong id="turn-label">Loading battle…</strong>
+        <span class="chip" id="phase-chip">—</span>
+      </div>
+    </header>
+
+    <div class="layout">
+      <div class="map-frame">
+        <canvas id="map" width="640" height="480" aria-label="Hex battlefield"></canvas>
+      </div>
+      <aside class="panel">
+        <div class="actions">
+          <button class="primary" id="end-turn" type="button">End turn</button>
+          <button id="hold" type="button">Finish activation</button>
+          <button id="restart" type="button">Restart</button>
+          <button id="reshuffle" type="button">New seed</button>
+          <button id="help-open" type="button">Help</button>
+          <button id="codex-open" type="button">Unit codex</button>
+          <span class="file">
+            <button id="import-btn" type="button">Import map</button>
+            <input id="import-file" type="file" accept="application/json,.json">
+          </span>
+        </div>
+        <p class="hint" id="hint">Select one of your units, move on a highlighted hex, then attack a highlighted enemy.</p>
+        <p class="toast" id="toast" aria-live="polite"></p>
+        <article class="card" id="unit-card"></article>
+        <div class="weapon-actions" id="weapons"></div>
+        <div class="roster" id="roster"></div>
+        <div class="log">
+          <h3>Battle log</h3>
+          <div id="log"></div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <div class="modal" id="help" hidden>
+    <div class="dialog" role="dialog" aria-labelledby="help-title">
+      <h2 id="help-title">How to fight</h2>
+      <ul>
+        <li>You command the Imperial Fists. Gold tokens are yours. Rust tokens are the Iron Warriors.</li>
+        <li>Click one of your units. Green hexes are legal moves. Red hexes are enemies you can attack.</li>
+        <li>Walls and chem-drains block movement. Vehicles cannot enter thorn scrub or bastions. Enemy units stop you in the adjacent hex.</li>
+        <li>A unit may move once, then attack once. Heavy and ordnance weapons strike less accurately after moving.</li>
+        <li>Curtain walls and thorn scrub block shooting. The road through the Iron Gate does not.</li>
+        <li>Stand on a strongpoint to take it. Empty strongpoints keep the last owner.</li>
+        <li>Win by destroying the Iron Warriors, by holding every strongpoint after their reply, or by holding two when turn 10 ends.</li>
+        <li>This is a simplified hex conversion of catalog characteristics, not the Horus Heresy tabletop rules.</li>
+        <li>Import accepts <code>panzerhammer-map-v1</code> or <code>panzerhammer-scenario-v1</code> JSON. The built-in field is an original placeholder.</li>
+      </ul>
+      <button id="help-close" type="button">Close</button>
+    </div>
+  </div>
+
+  <div class="modal" id="codex" hidden>
+    <div class="dialog" role="dialog" aria-labelledby="codex-title">
+      <h2 id="codex-title">Unit codex</h2>
+      <p class="hint">Characteristics are copied from the unit catalog. Move, range, and combat scores are the PanzerHammer conversion.</p>
+      <div id="codex-body" class="codex-list"></div>
+      <button id="codex-close" type="button">Close</button>
+    </div>
+  </div>
+
+  <script src="catalog.js"></script>
+  <script src="engine.js"></script>
+  <script src="ai.js"></script>
+  <script src="scenarios/iron-gate.js"></script>
+  <script src="ui.js"></script>
+</body>
+</html>
