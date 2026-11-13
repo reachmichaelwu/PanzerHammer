@@ -1,0 +1,53 @@
+{
+  "format": "panzerhammer-scenario-v1",
+  "sides": {
+    "player": { "id": "imperial_fists", "label": "Imperial Fists" },
+    "enemy": { "id": "iron_warriors", "label": "Iron Warriors" }
+  },
+  "order": [
+    { "instanceId": "if-sigismund", "catalogId": "sigismund", "side": "player", "col": 6, "row": 10, "token": "SIG", "name": "Sigismund" },
+    { "instanceId": "if-phalanx", "catalogId": "phalanx_warder", "side": "player", "col": 4, "row": 9, "token": "PHX", "name": "Phalanx Warders" },
+    { "instanceId": "if-breach", "catalogId": "breacher", "side": "player", "col": 8, "row": 9, "token": "BRC", "name": "Breacher Squad" },
+    { "instanceId": "if-tac", "catalogId": "tactical", "side": "player", "col": 3, "row": 10, "token": "TAC", "name": "Tactical Squad", "art": "legions/Imperialfist_Marine.jpg" },
+    { "instanceId": "if-heavy", "catalogId": "heavy_support", "side": "player", "col": 9, "row": 10, "token": "LAS", "name": "Heavy Support Squad" },
+    { "instanceId": "if-pred", "catalogId": "predator", "side": "player", "col": 6, "row": 9, "token": "PRD", "name": "Predator" },
+    { "instanceId": "if-con", "catalogId": "contemptor", "side": "player", "col": 5, "row": 10, "token": "CON", "name": "Contemptor Dreadnought" },
+    { "instanceId": "iw-vin", "catalogId": "vindicator", "side": "enemy", "col": 6, "row": 0, "token": "VIN", "name": "Vindicator" },
+    { "instanceId": "iw-tyr", "catalogId": "tyrant_siege_term", "side": "enemy", "col": 4, "row": 0, "token": "TYR", "name": "Tyrant Siege Terminators" },
+    { "instanceId": "iw-tac", "catalogId": "tactical", "side": "enemy", "col": 8, "row": 0, "token": "TAC", "name": "Tactical Squad", "art": "legions/ironwarrior_marine.jpg" },
+    { "instanceId": "iw-rap", "catalogId": "rapier", "side": "enemy", "col": 10, "row": 0, "token": "RPR", "name": "Auxilia Rapier" },
+    { "instanceId": "iw-cat", "catalogId": "cataphractii", "side": "enemy", "col": 1, "row": 0, "token": "CAT", "name": "Cataphractii Terminators" },
+    { "instanceId": "iw-heavy", "catalogId": "heavy_support", "side": "enemy", "col": 2, "row": 1, "token": "LAS", "name": "Heavy Support Squad" },
+    { "instanceId": "iw-war", "catalogId": "warsmith", "side": "enemy", "col": 6, "row": 1, "token": "WSM", "name": "Warsmith" }
+  ],
+  "map": {
+    "format": "panzerhammer-map-v1",
+    "id": "iron-gate",
+    "name": "The Iron Gate",
+    "provenance": "original-placeholder",
+    "provenanceNote": "Original hex battlefield drawn for this prototype. It is not a Panzer Marshal, OpenPanzer, or Panzer General map. OpenPanzer scenario geometry was not imported: the OpenPanzer README licenses the program code as GPL-2.0-or-later, but the scenario and map files are converted Panzer General 2 content without a separate asset license, and the GitHub license field is empty.",
+    "briefing": "An original fortress approach, not a Panzer Marshal map. The west curtain is already breached. Sigismund must take the Iron Gate and its bastions from the Iron Warriors. Hold every strongpoint through their reply, or any two when turn 10 ends. The Rapier is the repository's Solar Auxilia Rapier Carrier, pressed in as an allied battery.",
+    "cols": 14,
+    "rows": 11,
+    "maxTurns": 10,
+    "objectivesNeeded": 2,
+    "terrainRows": [
+      "b.b.b.r.b.bbb.",
+      "..f..tr.t..f..",
+      "..t..tr.t..t..",
+      "wwbwwwgwwwwwww",
+      "..n..nrn...n..",
+      "tt....r....tt.",
+      ".b....r....b..",
+      "......r.......",
+      "..u...r...u...",
+      "......r.......",
+      "......r......."
+    ],
+    "objectives": [
+      { "id": "west", "name": "West Bastion", "col": 2, "row": 1, "owner": "enemy" },
+      { "id": "gate", "name": "Iron Gate", "col": 6, "row": 3, "owner": "enemy" },
+      { "id": "east", "name": "East Bastion", "col": 11, "row": 1, "owner": "enemy" }
+    ]
+  }
+}
