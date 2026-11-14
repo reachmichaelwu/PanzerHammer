@@ -43,9 +43,10 @@
           <button id="reshuffle" type="button">New seed</button>
           <button id="help-open" type="button">Help</button>
           <button id="codex-open" type="button">Unit codex</button>
+          <button id="private-open" type="button">Private maps</button>
           <span class="file">
             <button id="import-btn" type="button">Import map</button>
-            <input id="import-file" type="file" accept="application/json,.json">
+            <input id="import-file" type="file" accept="application/json,.json,.xml,text/xml">
           </span>
         </div>
         <p class="hint" id="hint">Select one of your units, move on a highlighted hex, then attack a highlighted enemy.</p>
@@ -73,7 +74,7 @@
         <li>Stand on a strongpoint to take it. Empty strongpoints keep the last owner.</li>
         <li>Win by destroying the Iron Warriors, by holding every strongpoint after their reply, or by holding two when turn 10 ends.</li>
         <li>This is a simplified hex conversion of catalog characteristics, not the Horus Heresy tabletop rules.</li>
-        <li>Import accepts <code>panzerhammer-map-v1</code> or <code>panzerhammer-scenario-v1</code> JSON. The built-in field is an original placeholder.</li>
+        <li>Import accepts <code>panzerhammer-map-v1</code> or <code>panzerhammer-scenario-v1</code> JSON, or an Open Panzer scenario XML file. Private maps from your machine are under Private maps. The built-in field is an original placeholder.</li>
       </ul>
       <button id="help-close" type="button">Close</button>
     </div>
@@ -88,9 +89,19 @@
     </div>
   </div>
 
+  <div class="modal" id="private-maps-modal" hidden>
+    <div class="dialog" role="dialog" aria-labelledby="private-title">
+      <h2 id="private-title">Private maps</h2>
+      <p class="hint">Open Panzer terrain downloaded on this machine. These files are not part of the public repository.</p>
+      <div id="private-map-list" class="codex-list"></div>
+      <button id="private-close" type="button">Close</button>
+    </div>
+  </div>
+
   <script src="catalog.js"></script>
   <script src="engine.js"></script>
   <script src="ai.js"></script>
+  <script src="tools/openpanzer-loader.js"></script>
   <script src="scenarios/iron-gate.js"></script>
   <script src="ui.js"></script>
 </body>

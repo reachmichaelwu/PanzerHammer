@@ -67,6 +67,7 @@
       outcomeText: state.outcomeText || "",
       cols: state.cols,
       rows: state.rows,
+      image: state.image || "",
       terrain: state.terrain,
       sides: state.sides,
       objectives: state.objectives.map(function (o) { return Object.assign({}, o); }),
@@ -702,6 +703,16 @@
     return ok(next, events);
   }
 
+  function safeImage(value) {
+    var text = String(value || "").trim();
+    if (!text) return "";
+    if (text.indexOf("..") >= 0) return "";
+    if (/^[a-z][a-z0-9+.-]*:/i.test(text)) return "";
+    if (text.charAt(0) === "/" || text.charAt(0) === "\\") return "";
+    if (!/^[A-Za-z0-9_./ -]+$/.test(text)) return "";
+    return text;
+  }
+
   function normalizeMap(doc) {
     if (!doc || typeof doc !== "object") throw new Error("Map file is empty.");
     if (doc.format !== "panzerhammer-map-v1") {
@@ -768,7 +779,8 @@
       terrain: terrain,
       objectives: objectives,
       maxTurns: Number(doc.maxTurns) || 10,
-      needed: Number(doc.objectivesNeeded || doc.needed) || 2
+      needed: Number(doc.objectivesNeeded || doc.needed) || 2,
+      image: safeImage(doc.image)
     };
   }
 
@@ -850,6 +862,7 @@
       outcomeText: "",
       cols: map.cols,
       rows: map.rows,
+      image: map.image || "",
       terrain: map.terrain,
       sides: options.sides || {
         player: { id: "imperial_fists", label: "Imperial Fists" },
