@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Original fixture for the PanzerHammer loader. Not an Open Panzer or Panzer General scenario. -->
+<map name="Synthetic Drill" rows="8" cols="8" turns="5, 8, 12" image="resources/maps/images/not-real.png">
+  <player id="0" side="0"/>
+  <player id="1" side="1"/>
+  <hex row="0" col="0" terrain="3"/>
+  <hex row="0" col="1" terrain="3" road="8"/>
+  <hex row="0" col="2" terrain="9"/>
+  <hex row="0" col="3" terrain="9" road="1"/>
+  <hex row="1" col="1" terrain="1" name="North Yard" victory="0">
+    <unit id="1" owner="0"/>
+  </hex>
+  <hex row="1" col="4" terrain="6"/>
+  <hex row="2" col="2" terrain="13"/>
+  <hex row="3" col="3" terrain="11" name="Keep" victory="1"/>
+  <hex row="4" col="0" terrain="15"/>
+  <hex row="4" col="5" terrain="4"/>
+  <hex row="5" col="1" road="16"/>
+  <hex row="5" col="6" terrain="10"/>
+  <hex row="6" col="2" terrain="8"/>
+  <hex row="7" col="7" terrain="16"/>
+  <reinforce turn="2">
+    <at row="7" col="0"><unit id="9" owner="1"/></at>
+  </reinforce>
+</map>

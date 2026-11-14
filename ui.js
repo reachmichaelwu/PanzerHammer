@@ -9,6 +9,8 @@
   var canvas = document.getElementById("map");
   var ctx = canvas.getContext("2d");
   var game = null;
+  var mapImage = null;
+  var mapImageSrc = null;
   var builtIn = null;
   var activeDoc = null;
   var selected = null;
@@ -211,8 +213,34 @@
     ctx.restore();
   }
 
+  function ensureMapImage() {
+    var src = game && game.image ? asset(game.image) : "";
+    if (src === mapImageSrc) return;
+    mapImageSrc = src;
+    mapImage = null;
+    canvas.dataset.mapImageReady = src ? "0" : "";
+    if (!src) return;
+    var requested = src;
+    var img = new Image();
+    img.onload = function () {
+      if (mapImageSrc !== requested) return;
+      mapImage = img;
+      canvas.dataset.mapImageReady = "1";
+      if (game) render();
+    };
+    img.onerror = function () {
+      if (mapImageSrc !== requested) return;
+      mapImage = null;
+      canvas.dataset.mapImageReady = "error";
+    };
+    img.src = requested;
+  }
+
   function drawMap() {
     ctx.clearRect(0, 0, layout.width, layout.height);
+    if (mapImage && mapImage.complete && mapImage.naturalWidth) {
+      ctx.drawImage(mapImage, 0, 0, layout.width, layout.height);
+    }
     var moves = [];
     var attacks = [];
     if (game.phase === "player" && selected && !busy) {
@@ -240,8 +268,16 @@
         gradient.addColorStop(0, colors[0]);
         gradient.addColorStop(1, colors[1]);
         trace(poly);
-        ctx.fillStyle = gradient;
-        ctx.fill();
+        if (mapImage && mapImage.complete && mapImage.naturalWidth) {
+          ctx.save();
+          ctx.globalAlpha = 0.4;
+          ctx.fillStyle = gradient;
+          ctx.fill();
+          ctx.restore();
+        } else {
+          ctx.fillStyle = gradient;
+          ctx.fill();
+        }
         if (moveKeys[col + "," + row]) {
           ctx.fillStyle = "rgba(96, 176, 112, 0.42)";
           ctx.fill();
@@ -457,9 +493,26 @@
     }
   }
 
+  function subtitleFor(current) {
+    if (current.provenance === "original-placeholder") {
+      return "Original fortress field. A placeholder, because Panzer Marshal map licensing is unclear.";
+    }
+    if (current.provenance === "private-open-panzer") {
+      return "Private Open Panzer terrain. Imperial Fists against Iron Warriors. This map is not part of the public repo.";
+    }
+    return "Imported battlefield · " + (current.provenance || "custom");
+  }
+
   function render() {
     if (!game) return;
     resizeCanvas();
+    ensureMapImage();
+    canvas.dataset.cols = String(game.cols);
+    canvas.dataset.rows = String(game.rows);
+    canvas.dataset.size = String(layout.size);
+    canvas.dataset.padX = String(layout.padX);
+    canvas.dataset.padY = String(layout.padY);
+    canvas.dataset.mapImage = game.image || "";
     drawMap();
     renderStatus();
     renderCard();
@@ -551,9 +604,13 @@
       seed: seed
     });
     document.getElementById("battle-name").textContent = game.name;
-    document.getElementById("battle-sub").textContent = game.provenance === "original-placeholder"
-      ? "Original fortress field. A placeholder, because Panzer Marshal map licensing is unclear."
-      : "Imported battlefield · " + (game.provenance || "custom");
+    document.getElementById("battle-sub").textContent = subtitleFor(game);
+    var eyebrow = document.querySelector(".eyebrow");
+    if (eyebrow) {
+      eyebrow.textContent = game.provenance === "private-open-panzer"
+        ? "PanzerHammer · private map"
+        : "PanzerHammer · original field";
+    }
     selected = game.units.find(function (unit) { return unit.side === "player" && unit.alive; });
     selected = selected ? selected.instanceId : null;
     inspected = selected;
@@ -642,7 +699,7 @@
     var doc = activeDoc || builtIn;
     if (!doc) return;
     boot(doc, game ? game.seed : 3001);
-    setToast("The Iron Gate is redeployed.");
+    setToast(game && game.provenance === "private-open-panzer" ? "The private map is redeployed." : "The battle is redeployed.");
   });
   document.getElementById("reshuffle").addEventListener("click", function () {
     var source = activeDoc || builtIn;
@@ -654,6 +711,78 @@
   document.getElementById("help-close").addEventListener("click", function () { document.getElementById("help").hidden = true; });
   document.getElementById("codex-open").addEventListener("click", openCodex);
   document.getElementById("codex-close").addEventListener("click", function () { document.getElementById("codex").hidden = true; });
+  function loadScript(src) {
+    return new Promise(function (resolve, reject) {
+      var script = document.createElement("script");
+      script.src = src;
+      script.onload = function () { resolve(); };
+      script.onerror = function () { reject(new Error("Could not read " + src + ".")); };
+      document.body.appendChild(script);
+    });
+  }
+
+  function fillPrivateList(entries) {
+    var body = document.getElementById("private-map-list");
+    body.replaceChildren();
+    if (!entries.length) {
+      var empty = document.createElement("p");
+      empty.className = "hint";
+      empty.textContent = "The private catalog is empty. Run node tools/fetch-openpanzer-maps.js";
+      body.appendChild(empty);
+      return;
+    }
+    entries.forEach(function (entry) {
+      var button = document.createElement("button");
+      button.type = "button";
+      button.className = "unit-btn";
+      button.textContent = entry.name + " (" + entry.cols + "×" + entry.rows + ")";
+      button.addEventListener("click", function () {
+        loadPrivateScenario(entry.bundle).catch(function (error) {
+          setToast(error.message || "Could not load that map.");
+        });
+      });
+      body.appendChild(button);
+    });
+  }
+
+  function openPrivateMaps() {
+    var modal = document.getElementById("private-maps-modal");
+    var list = document.getElementById("private-map-list");
+    modal.hidden = false;
+    list.replaceChildren();
+    var waiting = document.createElement("p");
+    waiting.className = "hint";
+    waiting.textContent = "Reading the private catalog…";
+    list.appendChild(waiting);
+    var ready = window.PANZERHAMMER_PRIVATE_CATALOG
+      ? Promise.resolve()
+      : loadScript("private-maps/catalog.js");
+    ready.then(function () {
+      fillPrivateList(window.PANZERHAMMER_PRIVATE_CATALOG || []);
+    }).catch(function () {
+      list.replaceChildren();
+      var note = document.createElement("p");
+      note.className = "hint";
+      note.textContent = "No private maps yet. On your machine run: node tools/fetch-openpanzer-maps.js";
+      list.appendChild(note);
+    });
+  }
+
+  function loadPrivateScenario(bundle) {
+    window.PANZERHAMMER_PRIVATE_SCENARIO = null;
+    return loadScript(bundle).then(function () {
+      var doc = window.PANZERHAMMER_PRIVATE_SCENARIO;
+      if (!doc || !doc.map) throw new Error("That private bundle did not include a scenario.");
+      boot(doc, doc.seed === undefined ? 3001 : doc.seed);
+      document.getElementById("private-maps-modal").hidden = true;
+      setToast("Private map loaded. It stays on this machine.");
+    });
+  }
+
+  document.getElementById("private-open").addEventListener("click", openPrivateMaps);
+  document.getElementById("private-close").addEventListener("click", function () {
+    document.getElementById("private-maps-modal").hidden = true;
+  });
   document.getElementById("import-btn").addEventListener("click", function () {
     document.getElementById("import-file").click();
   });
@@ -663,7 +792,14 @@
     var reader = new FileReader();
     reader.onload = function () {
       try {
-        importDocument(JSON.parse(String(reader.result)));
+        var text = String(reader.result);
+        var trimmed = text.trim();
+        if (trimmed.charAt(0) === "<" || /\.xml$/i.test(file.name || "")) {
+          if (!window.OpenPanzerLoader) throw new Error("The Open Panzer loader is not on this page.");
+          importDocument(window.OpenPanzerLoader.parseOpenPanzerXml(text));
+          return;
+        }
+        importDocument(JSON.parse(text));
       } catch (error) {
         setToast(error.message || "Could not import that file.");
       }
@@ -690,6 +826,7 @@
     if (event.key === "Escape") {
       document.getElementById("help").hidden = true;
       document.getElementById("codex").hidden = true;
+      document.getElementById("private-maps-modal").hidden = true;
     } else if ((event.key === "e" || event.key === "E") && document.activeElement === document.body) {
       endTurn();
     } else if (event.key === "?" ) {
